@@ -27,6 +27,12 @@ def init_curses():
 	return screen
 
 
+def get_grid_index(x,y):
+	x = (x-2)/4
+	y = (y-1)/2
+	i = (y*3) + x
+	return i	
+
 def print_grid():
 	screen = init_curses()
 	x = 2
@@ -53,8 +59,12 @@ def print_grid():
 				if y>5: y = 5 
 			elif char == curses.KEY_ENTER or char == 10 or char == 13:
 				#change the grid entries here
-				grid[random.randint(0,8)] = "X"
-						
+				i =  get_grid_index(x,y)
+				if grid[i] == "X":
+					grid[i] = "O"
+				else:
+					grid[i] = "X"				
+			
 			screen.addstr(0,0,draw_grid.format(*grid))
 			screen.move(y,x)
 	finally:
