@@ -1,8 +1,8 @@
 import curses
 import sys
+import random
 
-#grid = (" "," "," "," "," "," ", " "," "," ")
-grid = ["1","2","3","4","5","6", "7","8","9"]
+grid = [" "," "," "," "," "," ", " "," "," "]
 draw_grid = "+---+---+---+\
 	  		\n| {0} | {1} | {2} |\
 			\n+---+---+---+\
@@ -24,7 +24,8 @@ def init_curses():
  
 	# map arrow keys to special values
 	screen.keypad(True)
-	return screen	
+	return screen
+
 
 def print_grid():
 	screen = init_curses()
@@ -33,7 +34,6 @@ def print_grid():
 	try:
 		screen.addstr(0,0,draw_grid.format(*grid))
 		screen.move(y,x)
-	#	screen.addstr(y,x,"X")
 		while True:
 			char = screen.getch()
 			if char == ord('q'):
@@ -51,16 +51,17 @@ def print_grid():
 			elif char == curses.KEY_DOWN:
 				y = y + 2
 				if y>5: y = 5 
-			elif char == curses.KEY_ENTER:
+			elif char == curses.KEY_ENTER or char == 10 or char == 13:
 				#change the grid entries here
-				grid[4] = "X"
-	
+				grid[random.randint(0,8)] = "X"
+						
 			screen.addstr(0,0,draw_grid.format(*grid))
 			screen.move(y,x)
 	finally:
-    # shut down cleanly
+    	# shut down cleanly
 		curses.nocbreak(); screen.keypad(0); curses.echo()
 		curses.endwin()
+
 
 
 if __name__ == '__main__':
