@@ -26,24 +26,35 @@ def init_curses():
 	screen.keypad(True)
 	return screen
 
-
 def get_grid_index(x,y):
 	x = (x-2)/4
 	y = (y-1)/2
 	i = (y*3) + x
 	return i	
 
+def is_game_over():
+	for i in range(len(grid)):
+		if grid[i] == " ":
+			return False
+	return True
+
+def play(human_move):
+	pass
+
 def print_grid():
 	screen = init_curses()
 	x = 2
 	y = 1
+	game_over = False
 	try:
 		screen.addstr(0,0,draw_grid.format(*grid))
 		screen.move(y,x)
-		while True:
+		while True: 
 			char = screen.getch()
 			if char == ord('q'):
 				break
+			if game_over:
+				continue
 			#move the cursor
 			elif char == curses.KEY_RIGHT:
 				x = x + 4
@@ -59,20 +70,24 @@ def print_grid():
 				if y>5: y = 5 
 			elif char == curses.KEY_ENTER or char == 10 or char == 13:
 				#change the grid entries here
-				i =  get_grid_index(x,y)
-				if grid[i] == "X":
-					grid[i] = "O"
+				human_move = get_grid_index(x,y)
+				bot_move = play(human_move)
+				if grid[human_move] == "X":
+					grid[human_move] = "O"
 				else:
-					grid[i] = "X"				
-			
+					grid[human_move] = "X"				
+
+			#render changes.
 			screen.addstr(0,0,draw_grid.format(*grid))
-			screen.move(y,x)
+			if not is_game_over():	
+				screen.move(y,x)
+			else:
+				game_over = True
+				screen.addstr(7,0,"Game Over")
 	finally:
     	# shut down cleanly
 		curses.nocbreak(); screen.keypad(0); curses.echo()
 		curses.endwin()
-
-
 
 if __name__ == '__main__':
 	print_grid()
