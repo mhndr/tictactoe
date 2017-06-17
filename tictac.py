@@ -1,5 +1,4 @@
 import curses
-import sys
 import random
 
 grid = [" "," "," "," "," "," ", " "," "," "]
@@ -45,7 +44,7 @@ def get_empty_cells():
 			empty_cells.append(i)
 	return empty_cells 
 
-def play(human_move):
+def play():
 	"""
 	I'm thinking of a logic to make this computer play this game. 
 	
@@ -60,6 +59,8 @@ def play(human_move):
 			game?
 	"""
 	empty_cells = get_empty_cells()
+	if not empty_cells:
+		return -1
 	rand = random.randrange(0,len(empty_cells))
 	return empty_cells[rand]
 
@@ -70,6 +71,12 @@ def print_grid():
 	y = 1
 	game_over = False
 	try:
+		#decide who should play first
+		bot_first = random.randint(0,100)%2
+		if bot_first:
+			bot_move = play()
+			if bot_move != -1:
+				grid[bot_move] = "O"
 		screen.addstr(0,0,draw_grid.format(*grid))
 		screen.move(y,x)
 		while True: 
@@ -94,9 +101,10 @@ def print_grid():
 			elif char == curses.KEY_ENTER or char == 10 or char == 13:
 				#change the grid entries here
 				human_move = get_grid_index(x,y)
-				bot_move = play(human_move)
 				grid[human_move] = "X"
-				grid[bot_move] = "O"
+				bot_move = play()
+				if bot_move != -1:
+					grid[bot_move] = "O"
 
 			#render changes.
 			screen.addstr(0,0,draw_grid.format(*grid))
