@@ -52,7 +52,7 @@ def play():
 		   	know when the game is over and also to know which
 			victory case to play for, given the current config.
 	
-		2. 	This is a tad too optimistic, here I'm thinking of
+		2. 	This is a tad too ambitious, here I'm thinking of
 			using this oppurtunity to teach myself machine learning
 			Can I use the principles of mach-learn.. to avoid 	
 			having to think up of a algorithm for playing this 
