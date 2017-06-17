@@ -10,6 +10,10 @@ draw_grid = "+---+---+---+\
 	  		\n| {6} | {7} | {8} |\
 			\n+---+---+---+"
 
+win_configs = [	'010010010', '001001001', 
+				'100010001', '100100100', 
+				'001010100', '111000000', 
+				'000111000', '000000111']
 
 def init_curses():
 	# get the curses screen window
@@ -32,6 +36,11 @@ def get_grid_index(x,y):
 	return i	
 
 def is_game_over():
+	if is_grid_full() or is_there_winner():
+		return True
+	return False
+	
+def is_grid_full():
 	for i in range(len(grid)):
 		if grid[i] == " ":
 			return False
@@ -49,6 +58,35 @@ def valid_move(move):
 	if move in empty_cells:
 		return True
 	return False 
+
+def is_there_winner():
+	winner = get_winner()
+	if winner == "~":
+		return False
+	return True
+
+	
+def get_winner():
+	curr_cfg = ""
+	for i in range(len(grid)):
+		if grid[i] == "X":
+			curr_cfg += "1"
+		else:
+			curr_cfg +="0"
+	if curr_cfg in win_configs:
+		return "X"
+
+	curr_cfg = ""
+	for i in range(len(grid)):
+		if grid[i] == "O":
+			curr_cfg += "1"
+		else:
+			curr_cfg +="0"
+	if curr_cfg in win_configs:
+		return "O"
+	
+	return "~"
+
 
 def play():
 	"""
@@ -85,6 +123,7 @@ def print_grid():
 			if bot_move != -1:
 				grid[bot_move] = "O"
 		screen.addstr(0,0,draw_grid.format(*grid))
+		screen.move(y,x)
 		while True: 
 			char = screen.getch()
 			if char == ord('q'):
@@ -116,11 +155,19 @@ def print_grid():
 
 			#render changes.
 			screen.addstr(0,0,draw_grid.format(*grid))
-			if not is_game_over():	
-				screen.move(y,x)
-			else:
+			screen.move(y,x)
+
+			if is_game_over():	
 				game_over = True
-				screen.addstr(7,0,"Game Over")
+				winner = get_winner()
+				if winner == "~":
+					screen.addstr(7,0,"Game Over - Its a Draw.")
+				elif winner == "X":
+					screen.addstr(7,0,"Game Over - You Win!")
+				elif winner == "O":
+					screen.addstr(7,0,"Game Over - I Win!!!!")
+			
+
 	finally:
     	# shut down cleanly
 		curses.nocbreak(); screen.keypad(0); curses.echo()
