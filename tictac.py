@@ -38,8 +38,31 @@ def is_game_over():
 			return False
 	return True
 
+def get_empty_cells():
+	empty_cells = []
+	for i in range(len(grid)):
+		if grid[i] == " ":
+			empty_cells.append(i)
+	return empty_cells 
+
 def play(human_move):
-	pass
+	"""
+	I'm thinking of a logic to make this computer play this game. 
+	
+		1. 	Have a bitmap of victory configs and use those to 
+		   	know when the game is over and also to know which
+			victory case to play for, given the current config.
+	
+		2. 	This is a tad too optimistic, here I'm thinking of
+			using this oppurtunity to teach myself machine learning
+			Can I use the principles of mach-learn.. to avoid 	
+			having to think up of a algorithm for playing this 
+			game?
+	"""
+	empty_cells = get_empty_cells()
+	rand = random.randrange(0,len(empty_cells))
+	return empty_cells[rand]
+
 
 def print_grid():
 	screen = init_curses()
@@ -72,10 +95,8 @@ def print_grid():
 				#change the grid entries here
 				human_move = get_grid_index(x,y)
 				bot_move = play(human_move)
-				if grid[human_move] == "X":
-					grid[human_move] = "O"
-				else:
-					grid[human_move] = "X"				
+				grid[human_move] = "X"
+				grid[bot_move] = "O"
 
 			#render changes.
 			screen.addstr(0,0,draw_grid.format(*grid))
