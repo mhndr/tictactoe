@@ -44,6 +44,12 @@ def get_empty_cells():
 			empty_cells.append(i)
 	return empty_cells 
 
+def valid_move(move):
+	empty_cells = get_empty_cells()
+	if move in empty_cells:
+		return True
+	return False 
+
 def play():
 	"""
 	I'm thinking of a logic to make this computer play this game. 
@@ -58,6 +64,7 @@ def play():
 			having to think up of a algorithm for playing this 
 			game?
 	"""
+	#for now the moves are random
 	empty_cells = get_empty_cells()
 	if not empty_cells:
 		return -1
@@ -78,7 +85,6 @@ def print_grid():
 			if bot_move != -1:
 				grid[bot_move] = "O"
 		screen.addstr(0,0,draw_grid.format(*grid))
-		screen.move(y,x)
 		while True: 
 			char = screen.getch()
 			if char == ord('q'):
@@ -101,6 +107,8 @@ def print_grid():
 			elif char == curses.KEY_ENTER or char == 10 or char == 13:
 				#change the grid entries here
 				human_move = get_grid_index(x,y)
+				if not valid_move(human_move): 
+					continue
 				grid[human_move] = "X"
 				bot_move = play()
 				if bot_move != -1:
