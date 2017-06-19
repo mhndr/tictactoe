@@ -10,10 +10,6 @@ draw_grid = "+---+---+---+\
 	  		\n| {6} | {7} | {8} |\
 			\n+---+---+---+"
 
-win_configs = [	'010010010', '001001001', 
-				'100010001', '100100100', 
-				'001010100', '111000000', 
-				'000111000', '000000111']
 
 def init_curses():
 	# get the curses screen window
@@ -67,47 +63,42 @@ def is_there_winner():
 
 	
 def get_winner():
-	curr_cfg = ""
-	for i in range(len(grid)):
-		if grid[i] == "X":
-			curr_cfg += "1"
-		else:
-			curr_cfg +="0"
-	if curr_cfg in win_configs:
-		return "X"
-
-	curr_cfg = ""
-	for i in range(len(grid)):
-		if grid[i] == "O":
-			curr_cfg += "1"
-		else:
-			curr_cfg +="0"
-	if curr_cfg in win_configs:
-		return "O"
+	#very bruteforce, very ugly :-(
+	#look at rows
+	for i in (0,3,6):
+		if grid[i] != " ":
+			if grid[i]==grid[i+1]==grid[i+2]:
+				return grid[i]
+	#look at cols
+	for i in range(3):
+		if grid[i] != " ":
+			if grid[i]==grid[i+3]==grid[i+6]:
+				return grid[i]
 	
+	#look at diagonals
+	if grid[0] != " " and grid[0]==grid[4]==grid[8]:
+		return grid [0]
+	if grid[2] != " " and grid[2]==grid[4]==grid[6]:
+		return grid[2]
+
 	return "~"
 
+def find_rank(ranked_cells,grid):
+	
 
 def play():
-	"""
-	I'm thinking of a logic to make this computer play this game. 
-	
-		1. 	Have a bitmap of victory configs and use those to 
-		   	know when the game is over and also to know which
-			victory case to play for, given the current config.
-	
-		2. 	This is a tad too ambitious, here I'm thinking of
-			using this oppurtunity to teach myself machine learning
-			Can I use the principles of mach-learn.. to avoid 	
-			having to think up of a algorithm for playing this 
-			game?
-	"""
-	#for now the moves are random
 	empty_cells = get_empty_cells()
-	if not empty_cells:
+	if not empty_cells or is_game_over():
 		return -1
-	rand = random.randrange(0,len(empty_cells))
-	return empty_cells[rand]
+	if empty_cells == 8:
+		rand = random.randrange(0,len(empty_cells))
+		return empty_cells[rand]
+
+	ranked_cells = {k:0 for k in empty_cells}
+	grid_copy = grid
+	find_rank(ranked_cells,grid_copy)
+		
+
 
 
 def print_grid():
@@ -129,9 +120,10 @@ def print_grid():
 			if char == ord('q'):
 				break
 			if game_over:
+				screen.addstr(8,0,"Press 'q' to exit")
 				continue
 			#move the cursor
-			elif char == curses.KEY_RIGHT:
+			if char == curses.KEY_RIGHT:
 				x = x + 4
 				if x>10:x = 10
 			elif char == curses.KEY_LEFT:
@@ -143,6 +135,7 @@ def print_grid():
 			elif char == curses.KEY_DOWN:
 				y = y + 2
 				if y>5: y = 5 
+
 			elif char == curses.KEY_ENTER or char == 10 or char == 13:
 				#change the grid entries here
 				human_move = get_grid_index(x,y)
@@ -153,10 +146,6 @@ def print_grid():
 				if bot_move != -1:
 					grid[bot_move] = "O"
 
-			#render changes.
-			screen.addstr(0,0,draw_grid.format(*grid))
-			screen.move(y,x)
-
 			if is_game_over():	
 				game_over = True
 				winner = get_winner()
@@ -166,8 +155,10 @@ def print_grid():
 					screen.addstr(7,0,"Game Over - You Win!")
 				elif winner == "O":
 					screen.addstr(7,0,"Game Over - I Win!!!!")
-			
-
+		
+			#render changes.
+			screen.addstr(0,0,draw_grid.format(*grid))
+			screen.move(y,x)
 	finally:
     	# shut down cleanly
 		curses.nocbreak(); screen.keypad(0); curses.echo()
@@ -175,4 +166,5 @@ def print_grid():
 
 if __name__ == '__main__':
 	print_grid()
+
 
