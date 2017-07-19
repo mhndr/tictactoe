@@ -83,23 +83,38 @@ def get_winner():
 
 	return "~"
 
-def find_rank(ranked_cells,grid):
-	
+def rank_moves(cell,grid):
+	empty_cells = get_empty_cells()
+	if not empty_cells:
+		winner = get_winner()
+		if winner == "X":
+			return 10		
+		elif winner == "O":
+			return -10
+		elif winner == "~":
+			return 0
+	else:
+		for cell in empty_cells:
+			grid[cell] = "X"
+			ranked_cells[cell] = rank_moves(cell,grid_copy)
+			
 
 def play():
 	empty_cells = get_empty_cells()
 	if not empty_cells or is_game_over():
 		return -1
-	if empty_cells == 8:
-		rand = random.randrange(0,len(empty_cells))
-		return empty_cells[rand]
+#	if empty_cells == 8:
+	rand = random.randrange(0,len(empty_cells))
+	return empty_cells[rand]
 
-	ranked_cells = {k:0 for k in empty_cells}
-	grid_copy = grid
-	find_rank(ranked_cells,grid_copy)
-		
+#	ranked_cells = {k:0 for k in empty_cells}
+#	grid_copy = grid
 
-
+#	the idea here is to recursively go through all
+#	possible moves and rank them 
+#	for cell in empty_cells:
+#		ranked_cells[cell] = rank_moves(cell,grid_copy)
+	
 
 def print_grid():
 	screen = init_curses()
