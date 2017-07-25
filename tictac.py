@@ -68,23 +68,10 @@ def is_there_winner():
 
 	
 def get_winner():
-	#look at rows
-	for i in (0,3,6):
-		if grid[i] != " ":
-			if grid[i]==grid[i+1]==grid[i+2]:
-				return grid[i]
-	#look at cols
-	for i in range(3):
-		if grid[i] != " ":
-			if grid[i]==grid[i+3]==grid[i+6]:
-				return grid[i]
-	
-	#look at diagonals
-	if grid[0] != " " and grid[0]==grid[4]==grid[8]:
-		return grid [0]
-	if grid[2] != " " and grid[2]==grid[4]==grid[6]:
-		return grid[2]
-
+	for win in wins:
+		if grid[win[0]] != " " and \
+			grid[win[0]] == grid[win[1]] == grid[win[2]]:
+			return grid[win[0]]
 	return "~"
 
 
