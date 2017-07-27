@@ -129,18 +129,16 @@ def main_loop():
 			char = screen.getch()
 			if char == ord('q'):
 				break
-			
-			if char == ord('r'):
-				game_over = False
-				x_moves.clear()
-				o_moves.clear()
-				for i in range(len(grid)):
-					grid[i] = " "
-				draw_start_screen(screen)
-				continue	
-			
+
 			if game_over:
 				screen.addstr(7,0,"Press 'q' to exit\nPress 'r' to replay")
+				if char == ord('r'):
+					game_over = False
+					x_moves.clear()
+					o_moves.clear()
+					for i in range(len(grid)):
+						grid[i] = " "
+					draw_start_screen(screen)
 				continue
 			
 			if char == curses.KEY_RIGHT:
