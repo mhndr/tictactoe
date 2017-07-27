@@ -14,7 +14,7 @@ o_moves = []
 wins = (set([0, 1, 2]), set([3, 4, 5]), 
 		set([8, 6, 7]), set([0, 3, 6]), 
 		set([1, 4, 7]), set([8, 2, 5]), 
-		set([0, 8, 4]), set([2, 4, 6]))
+		set([0, 4, 8]), set([2, 4, 6]))
 
 def init_curses():
 	# get the curses screen window
@@ -43,7 +43,6 @@ def is_game_over():
 	
 def is_grid_full():
 	for i in range(len(grid)):
-		if grid[i] == " ":
 			return False
 	return True
 
@@ -106,6 +105,18 @@ def play():
 	rand = random.randrange(0,len(empty_cells))
 	return empty_cells[rand]
 
+def draw_start_screen(screen):
+	#decide who should play first
+	bot_first = random.randint(0,100)%2
+	if bot_first:
+		bot_move = play()
+		if bot_move != -1:
+			grid[bot_move] = "O"
+			o_moves.append(bot_move)
+	screen.erase()	
+	screen.addstr(0,0,draw_grid.format(*grid))
+	screen.addstr(7,0,"Use arrow keys to play.")
+	
 
 def main_loop():
 	screen = init_curses()
@@ -113,22 +124,23 @@ def main_loop():
 	y = 1
 	game_over = False
 	try:
-		#decide who should play first
-		bot_first = random.randint(0,100)%2
-		if bot_first:
-			bot_move = play()
-			if bot_move != -1:
-				grid[bot_move] = "O"
-				o_moves.append(bot_move)
-		screen.addstr(0,0,draw_grid.format(*grid))
-		screen.addstr(7,0,"Use arrow keys to play.")
-		#screen.move(y,x)
+		draw_start_screen(screen)
 		while True: 
 			char = screen.getch()
 			if char == ord('q'):
 				break
+			
+			if char == ord('r'):
+				game_over = False
+				del x_moves[:]
+				del o_moves[:]
+				for i in range(len(grid)):
+					grid[i] = " "
+				draw_start_screen(screen)
+				continue	
+			
 			if game_over:
-				screen.addstr(8,0,"Press 'q' to exit")
+				screen.addstr(7,0,"Press 'q' to exit\nPress 'r' to replay")
 				continue
 			#move the cursor
 			if char == curses.KEY_RIGHT:
