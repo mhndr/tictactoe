@@ -11,10 +11,10 @@ draw_grid = "+---+---+---+\
 			\n+---+---+---+"
 x_moves = []
 o_moves = []
-wins = ((0, 1, 2), (3, 4, 5), (6, 7, 8), 
-		(0, 3, 6), (1, 4, 7), (2, 5, 8), 
-		(0, 4, 8), (2, 4, 6)) 
-
+wins = (set([0, 1, 2]), set([3, 4, 5]), 
+		set([8, 6, 7]), set([0, 3, 6]), 
+		set([1, 4, 7]), set([8, 2, 5]), 
+		set([0, 8, 4]), set([2, 4, 6]))
 
 def init_curses():
 	# get the curses screen window
@@ -69,50 +69,45 @@ def is_there_winner():
 	
 def get_winner():
 	for win in wins:
+		win = list(win)
 		if grid[win[0]] != " " and \
 			grid[win[0]] == grid[win[1]] == grid[win[2]]:
 			return grid[win[0]]
 	return "~"
 
 
+def get_winning_move(moves):
+	winning_moves = []
+	for win in wins:
+		if win.intersection(moves):
+			winning_moves = list(win.difference(moves))
+			if len(winning_moves) == 1 and valid_move(winning_moves[0]):
+				return winning_moves[0]
+	return None	
+
 def play():
 	empty_cells = get_empty_cells()
-	if not empty_cells or is_game_over():
+	if not empty_cells: 
 		return -1
-	if empty_cells == 8:
-		rand = random.randrange(0,len(empty_cells))
-		return empty_cells[rand]
 
 	# see if there's an immediate winning move at hand.
-	win_options = []		
-	for win in wins:
-		for move in o_moves:
-			if move in win:
-				win_options.append(win)
-	for win in win_options:
-		winning_move = [i for i in win if i not in o_moves]
-		if len(winning_move) == 1 and valid_move(winning_move[0]):
-			return int(winning_move[0])			
+	winning_move = get_winning_move(set(o_moves))		
+	if winning_move:
+		return winning_move
+
 	
 	#find winning options for human and block them
-	block_options = []
-	for win in wins: 
-		for move in x_moves:
-			if move in win:
-				block_options.append(win)
-	#if human is one move away from winning, take it ;-)
-	for block in block_options:
-		blocking_move = [i  for i in block if i not in x_moves]		
-		if len(blocking_move) == 1 and valid_move(blocking_move[0]):
-			return int(blocking_move[0])
-
+	blocking_move = get_winning_move(set(x_moves))
+	if blocking_move:		
+		return blocking_move	
 
 	#fall back to a random move if there isn't an immediate win or block.	
+	#TODO: can optimise this to pick a move thats closest to a winning move.
 	rand = random.randrange(0,len(empty_cells))
 	return empty_cells[rand]
 
 
-def print_grid():
+def main_loop():
 	screen = init_curses()
 	x = 2
 	y = 1
@@ -178,6 +173,6 @@ def print_grid():
 		curses.endwin()
 
 if __name__ == '__main__':
-	print_grid()
+	main_loop()
 
 
