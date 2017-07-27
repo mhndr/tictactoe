@@ -9,8 +9,8 @@ draw_grid = "+---+---+---+\
 			\n+---+---+---+\
 	  		\n| {6} | {7} | {8} |\
 			\n+---+---+---+"
-x_moves = []
-o_moves = []
+x_moves = set()
+o_moves = set()
 wins = (set([0, 1, 2]), set([3, 4, 5]), 
 		set([8, 6, 7]), set([0, 3, 6]), 
 		set([1, 4, 7]), set([8, 2, 5]), 
@@ -43,6 +43,7 @@ def is_game_over():
 	
 def is_grid_full():
 	for i in range(len(grid)):
+		if grid[i] == " ":	
 			return False
 	return True
 
@@ -90,18 +91,17 @@ def play():
 		return -1
 
 	# see if there's an immediate winning move at hand.
-	winning_move = get_winning_move(set(o_moves))		
+	winning_move = get_winning_move(o_moves)		
 	if winning_move:
 		return winning_move
 
-	
 	#find winning options for human and block them
-	blocking_move = get_winning_move(set(x_moves))
+	blocking_move = get_winning_move(x_moves)
 	if blocking_move:		
 		return blocking_move	
 
 	#fall back to a random move if there isn't an immediate win or block.	
-	#TODO: can optimise this to pick a move that's closest to a winning move.
+	#TODO: can optimise this to pick a move that's closer to a winning combination.
 	rand = random.randrange(0,len(empty_cells))
 	return empty_cells[rand]
 
@@ -112,7 +112,7 @@ def draw_start_screen(screen):
 		bot_move = play()
 		if bot_move != -1:
 			grid[bot_move] = "O"
-			o_moves.append(bot_move)
+			o_moves.add(bot_move)
 	screen.erase()	
 	screen.addstr(0,0,draw_grid.format(*grid))
 	screen.addstr(7,0,"Use arrow keys to play.")
@@ -132,8 +132,8 @@ def main_loop():
 			
 			if char == ord('r'):
 				game_over = False
-				del x_moves[:]
-				del o_moves[:]
+				x_moves.clear()
+				o_moves.clear()
 				for i in range(len(grid)):
 					grid[i] = " "
 				draw_start_screen(screen)
@@ -142,7 +142,7 @@ def main_loop():
 			if game_over:
 				screen.addstr(7,0,"Press 'q' to exit\nPress 'r' to replay")
 				continue
-			#move the cursor
+			
 			if char == curses.KEY_RIGHT:
 				x = x + 4
 				if x>10:x = 10
@@ -162,11 +162,11 @@ def main_loop():
 				if not valid_move(human_move): 
 					continue
 				grid[human_move] = "X"
-				x_moves.append(human_move)
+				x_moves.add(human_move)
 				bot_move = play()
 				if bot_move != -1:
 					grid[bot_move] = "O"
-					o_moves.append(bot_move)
+					o_moves.add(bot_move)
 			if is_game_over():	
 				game_over = True
 				winner = get_winner()
