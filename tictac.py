@@ -102,7 +102,7 @@ def play():
 		return blocking_move	
 
 	#fall back to a random move if there isn't an immediate win or block.	
-	#TODO: can optimise this to pick a move thats closest to a winning move.
+	#TODO: can optimise this to pick a move that's closest to a winning move.
 	rand = random.randrange(0,len(empty_cells))
 	return empty_cells[rand]
 
@@ -121,7 +121,8 @@ def main_loop():
 				grid[bot_move] = "O"
 				o_moves.append(bot_move)
 		screen.addstr(0,0,draw_grid.format(*grid))
-		screen.move(y,x)
+		screen.addstr(7,0,"Use arrow keys to play.")
+		#screen.move(y,x)
 		while True: 
 			char = screen.getch()
 			if char == ord('q'):
@@ -158,15 +159,16 @@ def main_loop():
 				game_over = True
 				winner = get_winner()
 				if winner == "~":
-					screen.addstr(7,0,"Game Over - Its a Draw.")
+					screen.addstr(7,0,"Game Over - Its a Draw.   ")
 				elif winner == "X":
-					screen.addstr(7,0,"Game Over - You Win!")
+					screen.addstr(7,0,"Game Over - You Win!      ")
 				elif winner == "O":
-					screen.addstr(7,0,"Game Over - I Win!!!!")
+					screen.addstr(7,0,"Game Over - I Win!!!!     ")
 		
 			#render changes.
 			screen.addstr(0,0,draw_grid.format(*grid))
 			screen.move(y,x)
+
 	finally:
     	# shut down cleanly
 		curses.nocbreak(); screen.keypad(0); curses.echo()
